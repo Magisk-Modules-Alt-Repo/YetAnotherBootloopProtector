@@ -1,8 +1,6 @@
 # Yet Another Bootloop Protector.
 - This module try to protect your device from bootloops and system ui failures caused by Magisk/KernelSU/APatch Modules
 
-[![Download](https://img.shields.io/badge/Download-Red?style=for-the-badge&logo=github)](https://github.com/rhythmcache/YetAnotherBootloopProtector/releases/download/V4/YetAnotherBootloopProtector-main-v4.zip)
-
 
 ## How does it work?
 • Each time the device fails to complete the boot, the module creates a "marker"
@@ -40,4 +38,5 @@ su -c rm -f /data/adb/systemui.monitor.disable
 - you can run `rm -f /data/local/tmp/service.log` to clear the logs.
 
 ---
-![Total Downloads](https://img.shields.io/github/downloads/rhythmcache/YetAnotherBootloopProtector/total?label=Total%20Downloads&style=for-the-badge)
+[![Download](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/total?label=Total%20Downloads&color=blue)](https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases)
+
