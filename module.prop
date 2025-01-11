@@ -4,4 +4,4 @@ version=5
 versionCode=13
 author=rhythmcache.t.me
 description=This module try to detect and fix bootloops caused by Magisk modules.
-updateJson=https://raw.githubusercontent.com/rhythmcache/YetAnotherBootloopProtector/main/update.Json
+updateJson=https://raw.githubusercontent.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/main/update.Json
