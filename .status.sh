@@ -10,6 +10,7 @@ for file in $REQUIRED_FILES; do
     if [ ! -f "$file" ]; then
         sed -i '/^description=/d' "$MODULE_PROP"
         echo "description= ⚠️ Warning : Module is corrupted. Please reinstall." >> "$MODULE_PROP"
+        touch "$MODULE_DIR/disable"
         exit 0
     fi
 done
