@@ -23,27 +23,25 @@ is_boot_completed() {
 
 # Disable All Magisk Modules
 disable_magisk_modules() {
-    log_event "Disabling all Magisk modules and updating permissions..."
+    log_event "Disabling all Magisk modules..."
+    for MODULE in "$MAGISK_MODULES_DIR"/*; do
+        if [ -d "$MODULE" ]; then
+            touch "$MODULE/disable"
+            log_event "Disabled module: $MODULE"
+        fi
+    done
     for DIR in /data/adb/service.d /data/adb/post-fs-data.d; do
         if [ -d "$DIR" ]; then
             find "$DIR" -type f -exec chmod 644 {} \;
             log_event "Changed permissions for files in $DIR"
         fi
     done
-    for MODULE in "$MAGISK_MODULES_DIR"/*; do
-        if [ -d "$MODULE" ]; then
-            touch "$MODULE/disable"
-            chown 0:0 "$MODULE/disable"
-            chmod 644 "$MODULE/disable"
-            log_event "Disabled module: $MODULE"
-        fi
-    done
     MODULE_PROP="$MARKER_DIR/module.prop"
     if [ -f "$MODULE_PROP" ]; then
         sed -i '/^description=/c\description=Module Was Disabled Because A Bootloop Was Detected.' "$MODULE_PROP"
+        log_event "Updated description in $MODULE_PROP"
     fi
 }
-
 # Check for marker files
 check_marker_files() {
     MARKER1="$MARKER_DIR/marker1"
