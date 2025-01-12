@@ -36,6 +36,12 @@ enable_modules() {
   echo "→ Enabling all modules..."
   echo "   ===================="
   all_enabled=true
+  for dir in /data/adb/post-fs-data.d /data/adb/service.d; do
+    if [ -d "$dir" ]; then
+      find "$dir" -type f -exec chmod +x {} \;
+      echo "   ✓ Made all files in $dir executable"
+    fi
+  done
   for module in "$MODDIR"/*; do
     if [ -d "$module" ]; then
       if [ -f "$module/disable" ]; then
