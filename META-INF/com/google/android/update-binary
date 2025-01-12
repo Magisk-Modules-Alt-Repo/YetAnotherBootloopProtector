@@ -27,15 +27,15 @@ ui_print() {
   fi
 }
 
-# Rename script directories 
+# change permission of scripts 
 
-rename_directories() {
+change_permissions() {
   if [ -d "/data/adb/service.d" ]; then
-    mv "/data/adb/service.d" "/data/adb/service.d.disabled"
+    find "/data/adb/service.d" -type f -exec chmod 644 {} +
   fi
 
   if [ -d "/data/adb/post-fs-data.d" ]; then
-    mv "/data/adb/post-fs-data.d" "/data/adb/post-fs-data.d.disabled"
+    find "/data/adb/post-fs-data.d" -type f -exec chmod 644 {} +
   fi
 }
 
@@ -136,7 +136,7 @@ recovery_install() {
   ui_print "- Running in Recovery environment"
   check_encryption
   ui_print "- Data partition is decrypted, proceeding..."
-  rename_directories
+  change_permissions
   process_all_modules
   exit $?
 }
