@@ -7,7 +7,7 @@
 - if you flash it in `custom recovery` , it will disable all the magisk/KSU/APatch modules for no reason. Flash it in `TWRP` only when necessary.
 
 
-- ### Bootloop
+ ### Bootloop
 
 - If a bootloop is detected, , it will automatically disable every Magisk/KSU/APatch module and set the permissions of all general scripts (scripts placed in `/data/adb/service.d` and `/data/adb/post-fs-data.d`) to 644
 
