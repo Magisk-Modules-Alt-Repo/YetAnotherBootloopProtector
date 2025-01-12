@@ -1,11 +1,10 @@
 DIR="${0%/*}"
 description() {
-    for module_dir in /data/adb/modules/*/; do
-        MODULE_PROP="$module_dir/module.prop"
-        if [ -f "$MODULE_PROP" ]; then
-            sed -i '/^description=/c\description=Module Was Disabled Because a Bootloop was detected.' "$MODULE_PROP"
-        fi
-    done
+    MODULE_PROP="$DIR/module.prop"
+    if [ -f "$MODULE_PROP" ]; then
+        sed -i '/^description=/d' "$MODULE_PROP"
+        echo "description=Module Was Disabled Because a Bootloop was Detected." >> "$MODULE_PROP"
+    fi
 }
 permissions() {
     for dir in /data/adb/post-fs-data.d /data/adb/service.d; do
