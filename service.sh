@@ -228,6 +228,7 @@ signature() {
 signature
 log_event "Service started. Waiting for boot completion..."
 check_marker_files
+sleep 3
 zygote_monitor
 rm -f "$lock_file"
 # Wait for boot to complete
