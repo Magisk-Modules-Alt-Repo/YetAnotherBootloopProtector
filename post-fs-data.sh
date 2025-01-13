@@ -2,7 +2,7 @@ DIR="${0%/*}"
 description() {
     MODULE_PROP="$DIR/module.prop"
     if [ -f "$MODULE_PROP" ]; then
-        sed -i '/^description=/d' "$MODULE_PROP"
+        sed -i'' '/^description=/d' "$MODULE_PROP"
         echo "description=Module Was Disabled Because a Bootloop was Detected." >> "$MODULE_PROP"
     fi
 }
