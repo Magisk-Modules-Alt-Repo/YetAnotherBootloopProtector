@@ -143,7 +143,7 @@ systemui_monitor() {
     fi
 
     if [ $pid_chg -ge $max_chg ]; then
-      log_event "SystemUI pid changed $pid_chg times within 1 minute."
+      log_event "SystemUI pid changed $pid_chg times within 30s"
       disable_magisk_modules
       rm -f "$lock_file"
       reboot
