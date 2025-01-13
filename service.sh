@@ -5,6 +5,7 @@ MAGISK_MODULES_DIR="/data/adb/modules"
 BOOT_TIMEOUT=100
 PACKAGE="com.android.systemui" #default: SystemUI
 MONITOR_DISABLE_FILE="/data/adb/systemui.monitor.disable"
+lock_file="/data/adb/.tmp.lock"
 
 # Log events
 log_event() {
@@ -36,11 +37,12 @@ disable_magisk_modules() {
             log_event "Changed permissions for files in $DIR"
         fi
     done
-    MODULE_PROP="$MARKER_DIR/module.prop"
-    if [ -f "$MODULE_PROP" ]; then
-        sed -i '/^description=/c\description=Module Was Disabled Because A Bootloop Was Detected.' "$MODULE_PROP"
-        log_event "Updated description in $MODULE_PROP"
-    fi
+MODULE_PROP="$MARKER_DIR/module.prop"
+if [ -f "$MODULE_PROP" ]; then
+    sed -i'' '/^description=/d' "$MODULE_PROP"
+    echo "description=Module Was Disabled Because a Bootloop Was Detected." >> "$MODULE_PROP"
+    log_event "Updated description in $MODULE_PROP"
+fi
 }
 # Check for marker files
 check_marker_files() {
@@ -75,6 +77,88 @@ is_package_running() {
     fi
 }
 
+# monitor zygote
+zygote_monitor() {
+  dur=25   #  duration
+  int=3    # interval
+  max=4    # Max pid changes
+  changes=0
+  last_pid=""
+  start=$(date +%s)
+
+  log_event "Zygote monitor started."
+
+  while :; do
+    now=$(date +%s)
+    if [ $((now - start)) -ge "$dur" ]; then
+      break
+    fi
+
+    cur_pid=$(pidof zygote 2>/dev/null || echo "")
+    if [ -n "$cur_pid" ] && [ "$cur_pid" != "$last_pid" ]; then
+      changes=$((changes + 1))
+      log_event "PID changed: $last_pid -> $cur_pid (Count: $changes)"
+      last_pid="$cur_pid"
+    fi
+
+    if [ "$changes" -ge "$max" ]; then
+      log_event "PID changed $changes times. Disabling modules."
+      disable_magisk_modules
+      reboot
+      return
+    fi
+
+    sleep "$int"
+  done
+
+  log_event "Zygote is OK"
+}
+
+#SystemUI - PID
+
+systemui_monitor() {
+  local monitor_dur=30  # Monitor duration
+  local check_int=3     # time between PID checks
+  local max_chg=3       # Max PID changes 
+  local pid_chg=0       # Counter for PID changes
+  local last_pid=""     # 
+  local curr_pid        # 
+  local start_time=$(date +%s)  # Start time of monitoring
+  local curr_time
+ 
+  log_event "Checking systemui pid "
+  touch "$lock_file"
+
+  while true; do
+    curr_time=$(date +%s)
+    if [ $((curr_time - start_time)) -ge $monitor_dur ]; then
+      break
+    fi
+
+    curr_pid=$(pidof "$PACKAGE")
+    if [ -n "$curr_pid" ] && [ "$curr_pid" != "$last_pid" ]; then
+      pid_chg=$((pid_chg + 1))
+      log_event "SystemUI PID changed: $last_pid -> $curr_pid (Change count: $pid_chg)"
+      last_pid="$curr_pid"
+    fi
+
+    if [ $pid_chg -ge $max_chg ]; then
+      log_event "SystemUI pid changed $pid_chg times within 1 minute."
+      disable_magisk_modules
+      rm -f "$lock_file"
+      reboot
+      return
+    fi
+
+    sleep "$check_int"
+  done
+
+  log_event "pid check completed "
+  rm -f "$lock_file"
+}
+
+
+
 # Monitor SystemUI
 monitor_package() {
     if [ -f "$MONITOR_DISABLE_FILE" ]; then
@@ -89,11 +173,18 @@ monitor_package() {
 
     while true; do
         if is_package_running; then
-            #log_event "$PACKAGE is running. Resetting failure timer."
             FAILURE_TIME=0
         else
             log_event "$PACKAGE is not running. Failure timer: $FAILURE_TIME seconds."
             FAILURE_TIME=$((FAILURE_TIME + CHECK_INTERVAL))
+            if [ ! -f "$lock_file" ]; then
+                systemui_monitor &
+            else
+            
+            : #DontRemoveThis
+            
+            fi
+            
             if [ $FAILURE_TIME -ge $MONITOR_TIMEOUT ]; then
                 log_event "$PACKAGE has not been running for $MONITOR_TIMEOUT seconds. Disabling Magisk modules and rebooting..."
                 disable_magisk_modules
@@ -103,6 +194,7 @@ monitor_package() {
         sleep $CHECK_INTERVAL
     done
 }
+
 # post fs check
 signature() {
     S1="$MARKER_DIR/s1"
@@ -128,7 +220,7 @@ signature() {
         log_event "Post-fs signature detected..."
         rm -f "$S1" "$S2" "$S3"
     else
-        log_event "Warning: Post-fs signature not found."
+        log_event "Warning: Post-fs signature not found.."
     fi
 }
 
@@ -136,7 +228,8 @@ signature() {
 signature
 log_event "Service started. Waiting for boot completion..."
 check_marker_files
-
+zygote_monitor
+rm -f "$lock_file"
 # Wait for boot to complete
 SECONDS_PASSED=0
 while [ $SECONDS_PASSED -lt $BOOT_TIMEOUT ]; do
