@@ -30,13 +30,12 @@ ui_print() {
 # change permission of scripts 
 
 change_permissions() {
-  if [ -d "/data/adb/service.d" ]; then
-    find "/data/adb/service.d" -type f -exec chmod 644 {} +
-  fi
-
-  if [ -d "/data/adb/post-fs-data.d" ]; then
-    find "/data/adb/post-fs-data.d" -type f -exec chmod 644 {} +
-  fi
+  DIRS="/data/adb/service.d /data/adb/post-fs-data.d /data/adb/post-mount.d /data/adb/boot-completed.d"
+  for DIR in $DIRS; do
+    if [ -d "$DIR" ]; then
+      find "$DIR" -type f ! -name ".status.sh" -exec chmod 644 {} +
+    fi
+  done
 }
 
 
@@ -116,7 +115,7 @@ process_all_modules() {
     found_modules=true
   fi
 
-  # Check Magisk modules
+#MagiskModules
   if [ -d "/data/adb/modules" ] && find "/data/adb/modules" -mindepth 1 -maxdepth 1 -type d | grep -q .; then
     ui_print "- Found Magisk modules"
     create_disable_files "/data/adb/modules"
