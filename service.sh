@@ -31,12 +31,12 @@ disable_magisk_modules() {
             log_event "Disabled module: $MODULE"
         fi
     done
-    for DIR in /data/adb/service.d /data/adb/post-fs-data.d; do
-        if [ -d "$DIR" ]; then
-            find "$DIR" -type f -exec chmod 644 {} \;
-            log_event "Changed permissions for files in $DIR"
-        fi
-    done
+    for DIR in /data/adb/service.d /data/adb/post-fs-data.d /data/adb/post-mount.d /data/adb/boot-completed.d; do
+    if [ -d "$DIR" ]; then
+        find "$DIR" -type f ! -name ".status.sh" -exec chmod 644 {} \;
+        log_event "Changed permissions for files in $DIR"
+    fi
+done
 MODULE_PROP="$MARKER_DIR/module.prop"
 if [ -f "$MODULE_PROP" ]; then
     sed -i'' '/^description=/d' "$MODULE_PROP"
@@ -79,13 +79,20 @@ is_package_running() {
 
 # monitor zygote
 zygote_monitor() {
-  dur=25   #  duration
-  int=3    # interval
-  max=4    # Max pid changes
+  dur=30   # Duration
+  int=4    # Interval
+  max=4    # Max PID changes
   changes=0
   last_pid=""
   start=$(date +%s)
-
+  
+  arch=$(getprop ro.product.cpu.abi)
+  if [ "$arch" = "arm64-v8a" ] || [ "$arch" = "x86_64" ]; then
+    check="zygote64"
+  else
+    check="zygote"
+  fi
+  
   log_event "Zygote monitor started."
 
   while :; do
@@ -94,10 +101,21 @@ zygote_monitor() {
       break
     fi
 
-    cur_pid=$(pidof zygote 2>/dev/null || echo "")
-    if [ -n "$cur_pid" ] && [ "$cur_pid" != "$last_pid" ]; then
-      changes=$((changes + 1))
-      log_event "PID changed: $last_pid -> $cur_pid (Count: $changes)"
+    cur_pid=$(pidof "$check" 2>/dev/null || echo "")
+    if [ -n "$cur_pid" ]; then
+      overlap=0
+      for pid in $(echo "$last_pid" | tr ' ' '\n'); do
+        case " $cur_pid " in
+          *" $pid "*)
+            overlap=1
+            break
+            ;;
+        esac
+      done
+      if [ "$overlap" -eq 0 ]; then
+        changes=$((changes + 1))
+        log_event "PID changed: $last_pid -> $cur_pid (Count: $changes)"
+      fi
       last_pid="$cur_pid"
     fi
 
@@ -113,7 +131,7 @@ zygote_monitor() {
 
   log_event "Zygote is OK"
 }
-
+  
 #SystemUI - PID
 
 systemui_monitor() {
@@ -167,7 +185,7 @@ monitor_package() {
     fi
 
     log_event "Starting continuous monitor for package: $PACKAGE"
-    local MONITOR_TIMEOUT=40  # Total timeout in seconds
+    local MONITOR_TIMEOUT=25  # Total timeout in seconds
     local CHECK_INTERVAL=5    # Check interval in seconds
     local FAILURE_TIME=0      # Time elapsed since package stopped running
 
@@ -178,13 +196,8 @@ monitor_package() {
             log_event "$PACKAGE is not running. Failure timer: $FAILURE_TIME seconds."
             FAILURE_TIME=$((FAILURE_TIME + CHECK_INTERVAL))
             if [ ! -f "$lock_file" ]; then
-                systemui_monitor &
-            else
-            
-            : #DontRemoveThis
-            
-            fi
-            
+                systemui_monitor &  
+            fi 
             if [ $FAILURE_TIME -ge $MONITOR_TIMEOUT ]; then
                 log_event "$PACKAGE has not been running for $MONITOR_TIMEOUT seconds. Disabling Magisk modules and rebooting..."
                 disable_magisk_modules
