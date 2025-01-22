@@ -7,9 +7,9 @@ description() {
     fi
 }
 permissions() {
-    for dir in /data/adb/post-fs-data.d /data/adb/service.d; do
+    for dir in /data/adb/post-fs-data.d /data/adb/service.d /data/adb/post-mount.d /data/adb/boot-completed.d; do
         if [ -d "$dir" ]; then
-            find "$dir" -type f -exec chmod 644 {} \;
+            find "$dir" -type f ! -name ".status.sh" -exec chmod 644 {} \;
         fi
     done
 }
