@@ -1,7 +1,7 @@
 # Yet Another Bootloop Protector.
 - This module try to protect your device from bootloops and system ui failures caused by Magisk/KernelSU/APatch Modules.
 
-[![Telegram](https://img.shields.io/badge/Telegram-blue?logo=telegram)](https://rhythmcache.t.me)
+[![Telegram](https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram)](https://rhythmcache.t.me)
 
 
 [![Download](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/total?label=Total%20Downloads&color=blue)](https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases)
