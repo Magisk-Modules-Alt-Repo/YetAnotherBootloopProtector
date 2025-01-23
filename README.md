@@ -1,6 +1,11 @@
 # Yet Another Bootloop Protector.
 - This module try to protect your device from bootloops and system ui failures caused by Magisk/KernelSU/APatch Modules.
 
+[![Telegram](https://img.shields.io/badge/Telegram-blue?logo=telegram)](https://rhythmcache.t.me)
+
+
+[![Download](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/total?label=Total%20Downloads&color=blue)](https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases)
+
 ## Installation
 
 - Flash it in `Magisk`,`KSU` or `Apatch`
@@ -9,7 +14,7 @@
 
  ### Bootloop
 
-- If a bootloop is detected, , it will automatically disable every Magisk/KSU/APatch module and set the permissions of all general scripts (scripts placed in `/data/adb/service.d` and `/data/adb/post-fs-data.d`) to 644
+- If a bootloop is detected, , it will automatically disable every Magisk/KSU/APatch module and set the permissions of all general scripts (scripts placed in `/data/adb/service.d` , `/data/adb/post-fs-data.d` `/data/adb/post-mount.d` and `/data/adb/boot-completed.d`) to 644
 
 - You can manually enable each module, or you can use the action button. Using the action button will also set executable permissions `chmod +x` for all general scripts
 
@@ -29,13 +34,16 @@
 - When three markers are present, the module considers the device to be in a boot loop , and  it disables all Magisk modules by creating a disable file in each module's folder. This action prevents those modules from loading during the next boot, which may help the device boot correctly.
 - The module waits for the boot to complete, checking every 5 seconds.
 If the boot does not complete within a set timeout period (2 minutes by default), the module assumes there is a boot problem, disables all Magisk modules and general scrips, and reboots the device.
+- The module also monitors the state of `zygote` during booting and disables all modules if unusual behavior is detected.
 
+- 
 ## SystemUI Monitor (optional)
 
 - some modules, especially `customization modules`, may sometimes cause SystemUI to crash. Enabling this could help in tracking and resolving such issues.
 - You will be prompted to disable or enable system ui monitor while installing the module.
 - if enabled , then The Module checks the status of the SystemUI process every 5 seconds.
-- If SystemUI is not running, the module starts tracking it and if SystemUI remains inactive for more than 40 seconds, the module assumes a failure of the device and it `disables` all the magisk modules and general scripts and triggers a `reboot`
+- If SystemUI is not running, the module starts tracking it and if SystemUI remains inactive for more than 25  seconds , or if it crashes too often the module assumes a failure of the device and it `disables` all the magisk modules and general scripts and triggers a `reboot`
+
 - To  `disable` the systemUi Monitor , you can create a file named `systemui.monitor.disable` in `/data/adb` or you can just run
 ```
 su -c touch /data/adb/systemui.monitor.disable
@@ -59,5 +67,3 @@ su -c rm -f /data/adb/systemui.monitor.disable
 
 
 ---
-[![Download](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/total?label=Total%20Downloads&color=blue)](https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases)
-
