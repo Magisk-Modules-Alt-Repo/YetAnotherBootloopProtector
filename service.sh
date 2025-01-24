@@ -178,6 +178,7 @@ systemui_monitor() {
 
 
 # Monitor SystemUI
+
 monitor_package() {
     if [ -f "$MONITOR_DISABLE_FILE" ]; then
         log_event "SystemUI monitoring is disabled. Exiting monitor."
@@ -188,16 +189,26 @@ monitor_package() {
     local MONITOR_TIMEOUT=25  # Total timeout in seconds
     local CHECK_INTERVAL=5    # Check interval in seconds
     local FAILURE_TIME=0      # Time elapsed since package stopped running
+    local PREVIOUS_PID=""     # Previous PID of the package
 
     while true; do
-        if is_package_running; then
+        CURRENT_PID=$(pidof "$PACKAGE")
+        
+        if [ -n "$CURRENT_PID" ]; then
+            if [ "$CURRENT_PID" != "$PREVIOUS_PID" ]; then
+                log_event "PID of $PACKAGE has changed from $PREVIOUS_PID to $CURRENT_PID."
+                PREVIOUS_PID="$CURRENT_PID"
+                if [ ! -f "$lock_file" ]; then
+                    systemui_monitor &
+                fi
+            fi
             FAILURE_TIME=0
         else
             log_event "$PACKAGE is not running. Failure timer: $FAILURE_TIME seconds."
             FAILURE_TIME=$((FAILURE_TIME + CHECK_INTERVAL))
             if [ ! -f "$lock_file" ]; then
-                systemui_monitor &  
-            fi 
+                systemui_monitor &
+            fi
             if [ $FAILURE_TIME -ge $MONITOR_TIMEOUT ]; then
                 log_event "$PACKAGE has not been running for $MONITOR_TIMEOUT seconds. Disabling Magisk modules and rebooting..."
                 disable_magisk_modules
