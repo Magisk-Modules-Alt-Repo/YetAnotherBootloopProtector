@@ -1,5 +1,9 @@
 # Yet Another Bootloop Protector.
 - This module try to protect your device from bootloops and system ui failures caused by Magisk/KernelSU/APatch Modules.
+-  Generally , This Module can fix these type of bootloops if their cause is Magisk Modules.
+  1)  The device repeatedly restarts but may show the boot animation  before crashing and restarting again.
+  2)  The device gets stuck at the boot animation and never progresses to the lock screen.
+  3)  device boots successfully, but SystemUI fails to start, causing a black or unresponsive screen."
 
 ## Installation
 
