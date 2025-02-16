@@ -1,0 +1,286 @@
+:root {
+    --primary: #333;
+    --danger: #555;
+    --warning: #777;
+    --success: #333;
+    --dark-bg: #121212;
+    --card-bg: #1E1E1E;
+    --text: #E0E0E0;
+    --text-secondary: #A0A0A0;
+    --border: rgba(255, 255, 255, 0.1);
+    --radius: 12px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-size: 14px;
+}
+
+.mmrl-safe-area {
+    padding-top: var(--window-inset-top, 0);
+    padding-bottom: var(--window-inset-bottom, 0);
+    padding-left: var(--window-inset-left, 0);
+    padding-right: var(--window-inset-right, 0);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.dialog, .confirm-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.dialog-content {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--radius);
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dialog-content h2 {
+    margin-bottom: 16px;
+}
+
+.dialog-content .btn-group {
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+body {
+    background: var(--dark-bg);
+    color: var(--text);
+    line-height: 1.4;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.header h1 {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.header p {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.card h2 {
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.status-item:last-child {
+    border-bottom: none;
+}
+
+.btn-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.2s;
+    background: var(--primary);
+    color: var(--text);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:active {
+    transform: scale(0.96);
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.btn:active::after {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 1;
+}
+
+.label {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.dialog, .confirm-dialog {
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+}
+
+.dialog-content {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--radius);
+    max-width: 400px;
+}
+
+#logContent {
+    font-size: 12px;
+    border-radius: var(--radius);
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.log-line {
+    padding: 4px;
+    border-bottom: 1px solid var(--border);
+}
+
+.log-line:last-child {
+    border-bottom: none;
+}
+
+
+.footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.footer a {
+    font-size: 14px;
+    text-decoration: underline;
+    color: #4da6ff;
+}
+
+.footer a:visited {
+    color: #4da6ff;
+}
+
+.footer a:hover {
+    color: #3399ff;
+}
+
+.watermark {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.arrow {
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 8px;
+    transition: transform 0.2s;
+}
+
+.arrow.down {
+    transform: rotate(90deg);
+}
+
+#zygoteDetails {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+#zygoteDetails.show {
+    max-height: 100px;
+}
+
+#monitorStatus {
+    background: var(--primary);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: var(--radius);
+    transition: background 0.2s, transform 0.1s;
+    text-align: center;
+}
+
+#monitorStatus:hover {
+    background: var(--success);
+    transform: scale(1.05);
+}
+
+.btn-small {
+    padding: 5px 8px;
+    font-size: 12px;
+}
+
+/*
+.watermark {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.3);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 16px;
+}
+*/
