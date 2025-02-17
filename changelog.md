@@ -1,2 +1,2 @@
-- Added a simple WebUI  
-![WebUI Screenshot](https://raw.githubusercontent.com/rhythmcache/YetAnotherBootloopProtector/main/e1.png)
+- Fixed root method detection in webui
+- fixed status not showing in description 
