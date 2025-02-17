@@ -87,14 +87,12 @@ let isEnvironmentSupported = false;
         }
         async function getRootMethod() {
     try {
-        const { stdout: ksudOut } = await exec('ksud --version');
-        const { stdout: apdOut } = await exec('apd --version');
-        const { stdout: magiskOut } = await exec('magisk -V');
-
+        const { stdout: ksudOut } = await exec("su -c 'ksud debug version | sed s/Kernel\\ Version://g'");
+        const { stdout: apdOut } = await exec("su -c apd --version");
+        const { stdout: magiskOut } = await exec("magisk -V");
         let methods = [];
-
-        if (ksudOut.includes('ksud')) {
-            methods.push(`KernelSU (${ksudOut.replace('ksud', '').trim()})`);
+        if (ksudOut.trim()) {
+            methods.push(`KernelSU (${ksudOut.trim()})`);
         }
         if (apdOut.includes('apd')) {
             methods.push(`APatch (${apdOut.replace('apd', '').trim()})`);
