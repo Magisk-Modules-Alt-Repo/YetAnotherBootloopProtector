@@ -15,38 +15,21 @@
                 <h1>Yet Another Bootloop Protector</h1>
                 <p id="moduleVersion">Loading version...</p>
             </div>
+
             <div class="card">
                 <h2>System Information</h2>
-                <div class="status-item">
-                    <span>Architecture :</span>
-                    <span id="deviceAbi">Loading...</span>
-                </div>
-                <div class="status-item">
-                    <span>Android Version :</span>
-                    <span id="androidVersion">Loading...</span>
-                </div>
-                <div class="status-item">
-                    <span>Kernel :</span>
-                    <span id="kernelVersion">Loading...</span>
-                </div>
-                <div class="status-item">
-                    <span>Root Method :</span>
-                    <span id="rootMethod">Loading...</span>
-                </div>
+                <div class="status-item"><span>Architecture :</span> <span id="deviceAbi">Loading...</span></div>
+                <div class="status-item"><span>Android Version :</span> <span id="androidVersion">Loading...</span></div>
+                <div class="status-item"><span>Kernel :</span> <span id="kernelVersion">Loading...</span></div>
+                <div class="status-item"><span>Root Method :</span> <span id="rootMethod">Loading...</span></div>
             </div>
+
             <div class="card">
                 <h2>Status</h2>
-                <div class="status-item">
-                    <span>SystemUI PID :</span>
-                    <span id="systemuiPid">Loading...</span>
-                </div>
-                <div class="status-item">
-                    <span>Zygote pid :</span>
-                    <span id="zygote32Pid">Loading...</span>
-                </div>
+                <div class="status-item"><span>SystemUI PID :</span> <span id="systemuiPid">Loading...</span></div>
+                <div class="status-item"><span>Zygote pid :</span> <span id="zygote32Pid">Loading...</span></div>
                 <div class="status-item" id="zygote64Row" style="display: none;">
-                    <span>Zygote64 pid :</span>
-                    <span id="zygote64Pid">Loading...</span>
+                    <span>Zygote64 pid :</span> <span id="zygote64Pid">Loading...</span>
                 </div>
                 <div class="status-item">
                     <span>SystemUI Monitor :</span>
@@ -56,32 +39,29 @@
                     <button class="btn btn-warning" onclick="restartSystemUI()">Restart SystemUI</button>
                 </div>
             </div>
+
             <div class="card">
                 <h2>Modules</h2>
-                <div class="status-item">
-                    <span>Installed :</span>
-                    <span id="installedModules">Loading...</span>
-                </div>
-                <div class="status-item">
-                    <span>Disabled :</span>
-                    <span id="disabledModules">Loading...</span>
-                </div>
+                <div class="status-item"><span>Installed :</span> <span id="installedModules">Loading...</span></div>
+                <div class="status-item"><span>Disabled :</span> <span id="disabledModules">Loading...</span></div>
                 <div class="btn-group">
                     <button class="btn btn-danger" onclick="disableAllModules()">Disable All Modules</button>
                     <button class="btn btn-primary" onclick="enableAllModules()">Enable All Modules</button>
+                    <button class="btn btn-success" onclick="openAllowedModulesDialog()">Allowed Modules</button>
+                    <button class="btn btn-warning" onclick="openAllowedScriptsDialog()">Allowed Scripts</button>
                 </div>
-            </div>            
+                <p class="watermark-note">* Allowed modules and scripts won't be disabled if a bootloop is detected.</p>
+            </div>
+
             <div class="card">
                 <h2>Logs</h2>
-                <div class="status-item">
-                    <span>Log Size :</span>
-                    <span id="logSize">Loading...</span>
-                </div>
+                <div class="status-item"><span>Log Size :</span> <span id="logSize">Loading...</span></div>
                 <div class="btn-group">
                     <button class="btn btn-primary" onclick="viewLogs()">View Logs</button>
                     <button class="btn btn-danger" onclick="clearLogs()">Clear Logs</button>
                 </div>
             </div>
+
             <div class="footer">
                 <a href="#" onclick="openLink('https://github.com/rhythmcache')">GitHub</a>
                 <a href="#" onclick="openLink('https://rhythmcache.t.me')">Telegram</a>
@@ -89,6 +69,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Dialogs (Moved to End of Body) -->
     <div id="logDialog" class="dialog">
         <div class="dialog-content">
             <h2>Log Content</h2>
@@ -96,6 +78,7 @@
             <button class="btn btn-primary" onclick="closeLogDialog()">Close</button>
         </div>
     </div>
+
     <div id="confirmDialog" class="confirm-dialog">
         <div class="dialog-content">
             <h2 id="confirmTitle">Confirm Action</h2>
@@ -106,6 +89,29 @@
             </div>
         </div>
     </div>
+
+    <div id="allowedModulesDialog" class="dialog">
+        <div class="dialog-content">
+            <h2>Select Allowed Modules</h2>
+            <div id="allowedModulesList" class="list-container"></div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="saveAllowedModules()">Save</button>
+                <button class="btn" onclick="closeAllowedModulesDialog()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="allowedScriptsDialog" class="dialog">
+        <div class="dialog-content">
+            <h2>Select Allowed Scripts</h2>
+            <div id="allowedScriptsList" class="list-container"></div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="saveAllowedScripts()">Save</button>
+                <button class="btn" onclick="closeAllowedScriptsDialog()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <div id="ksuDialog" class="dialog">
         <div class="dialog-content">
             <h2>MMRL Detected</h2>
@@ -115,6 +121,7 @@
             </button>
         </div>
     </div>
+
     <script src="index.js"></script>
 </body>
 </html>
