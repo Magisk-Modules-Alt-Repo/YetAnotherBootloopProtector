@@ -35,7 +35,9 @@
 If the boot does not complete within a set timeout period (2 minutes by default), the module assumes there is a boot problem, disables all Magisk modules and general scrips, and reboots the device.
 - The module also monitors the state of `zygote` during booting and disables all modules if unusual behavior is detected.
 
-- 
+  ### whitelist
+- you can add module-id to `/data/adb/YABP/allowed-modules.txt` ,and script names to allowed-scripts.txt, those scripts/modules wont be disabled even if a bootloop is detected
+
 ## SystemUI Monitor (optional)
 
 - some modules, especially `customization modules`, may sometimes cause SystemUI to crash. Enabling this could help in tracking and resolving such issues.
