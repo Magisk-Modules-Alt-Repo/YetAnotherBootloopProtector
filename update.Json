@@ -1,6 +1,6 @@
 {
-    "versionCode": 20,
-    "version": "9.2 (19-238b4b1-release)-fix",
-    "zipUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases/download/v4.3.2/YetAnotherBootloopProtector-v4.3.2-fix.zip",
+    "versionCode": 21,
+    "version": "9.3 (21-5ba7362-release)",
+    "zipUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases/download/4.4/YetAnotherBootloopProtector-21-4.4.zip",
     "changelog": "https://raw.githubusercontent.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/main/changelog.md"
 }
