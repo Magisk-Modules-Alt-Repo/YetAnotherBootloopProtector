@@ -13,6 +13,8 @@ umask 022
 OUTFD=$2
 ZIPFILE=$3
 MOUNT_POINT="/data/local/mount_modules"
+file=/data/adb/YABP/allowed-modules.txt
+file2=/data/adb/YABP/allowed-scripts.txt
 
 ui_print() {
   if [ "$BOOTMODE" != "true" ]; then
@@ -26,21 +28,46 @@ ui_print() {
     echo "$*"
   fi
 }
-
-# change permission of scripts 
-
 change_permissions() {
   DIRS="/data/adb/service.d /data/adb/post-fs-data.d /data/adb/post-mount.d /data/adb/boot-completed.d"
+
+  allowed_scripts=""
+  if [ -f "$file2" ]; then
+    while IFS= read -r line; do
+      if [ "${line#\#}" != "$line" ] || [ -z "$line" ]; then
+        continue 
+      else
+        allowed_scripts="$allowed_scripts $line"
+      fi
+    done < "$file2"
+  fi
+
   for DIR in $DIRS; do
     if [ -d "$DIR" ]; then
-      find "$DIR" -type f ! -name ".status.sh" -exec chmod 644 {} +
+      find "$DIR" -type f | while read -r SCRIPT; do
+        SCRIPT_NAME=$(basename "$SCRIPT")
+        if [ "$SCRIPT_NAME" = ".status.sh" ]; then
+          continue
+        fi
+
+        skip=false
+        for allowed_script in $allowed_scripts; do
+          if [ "$SCRIPT_NAME" = "$allowed_script" ]; then
+            skip=true
+            break
+          fi
+        done
+
+        if $skip; then
+          continue
+        fi
+        chmod 644 "$SCRIPT"
+      done
     fi
   done
 }
 
 
-
-# Permissions Check
 check_encryption() {
   if [ ! -d "/data/adb" ]; then
     ui_print "Error: Can't Access /data/adb, Data is encrypted?"
@@ -52,14 +79,30 @@ check_encryption() {
 
 create_disable_files() {
   local base_dir="$1"
+
+  allowed_modules=""
+  if [ -f "$file" ]; then
+    while IFS= read -r line; do
+      if [ "${line#\#}" != "$line" ] || [ -z "$line" ]; then
+        continue 
+      else
+        allowed_modules="$allowed_modules $line"
+      fi
+    done < "$file"
+  fi
+
   for module_dir in "$base_dir"/*; do
     if [ -d "$module_dir" ] && [ "$(basename "$module_dir")" != "lost+found" ]; then
       local module_name
       module_name=$(basename "$module_dir")
-      ui_print "- Disabling: $module_name"
-      touch "$module_dir/disable" || exit 1
-      chown 0:0 "$module_dir/disable"
-      chmod 644 "$module_dir/disable"
+      if [ -n "$(echo " $allowed_modules " | grep " $module_name ")" ]; then
+        continue
+      else
+        ui_print "- Disabling: $module_name"
+        touch "$module_dir/disable" || exit 1
+        chown 0:0 "$module_dir/disable"
+        chmod 644 "$module_dir/disable"
+      fi
     fi
   done
 }
@@ -150,7 +193,7 @@ if [ "$BOOTMODE" = "true" ]; then
     ui_print " => Running in Magisk"
     [ -f /data/adb/magisk/util_functions.sh ] || require_new_magisk
     . /data/adb/magisk/util_functions.sh
-    [ $MAGISK_VER_CODE -lt 20400 ] && require_new_magisk
+    [ "$MAGISK_VER_CODE" -lt 20400 ] && require_new_magisk
     install_module
 else
     ui_print "[*] Recovery environment detected"
