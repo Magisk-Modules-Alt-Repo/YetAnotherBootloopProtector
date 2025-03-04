@@ -1,0 +1,17 @@
+# Allowed Scripts - /data/adb/YABP/allowed-scripts.txt
+# ----------------------------------------------------
+# add the list of scripts that should NOT have their
+# permissions changed even if a bootloop is detected.
+#
+# How to Add a Script:
+# - Each script filename should be written on a new line.
+# - Names must match the actual filename inside:
+#   /data/adb/service.d, /data/adb/post-fs-data.d, /data/adb/post-mount.d, or /data/adb/boot-completed.d.
+# Lines starting with '#' will be ignored.
+# - Example:
+#
+# my-script.sh
+# another-script.sh
+#
+#
+# These scripts will retain their executable permissions and won't be modified if a bootloop is detected

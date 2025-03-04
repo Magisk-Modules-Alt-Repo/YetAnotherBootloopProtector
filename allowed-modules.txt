@@ -1,0 +1,16 @@
+# Allowed Modules - /data/adb/YABP/allowed-modules.txt
+# ---------------------------------------------------
+# add the list of Magisk modules in this file that should
+# NOT be disabled even if a bootloop is detected.
+#
+# How to Add a Module:
+# - Each module-id should be written on a new line.
+# - Names must match the actual folder name in /data/adb/modules
+# - Lines starting with '#' are considered comments and will be ignored.
+#
+# - Example :
+# ExampleModule1
+# ExampleModule2
+#
+#
+# If these modules exist, they will remain enabled even during a bootloop recovery.
