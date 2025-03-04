@@ -273,14 +273,22 @@ body {
     padding: 5px 8px;
     font-size: 12px;
 }
-
-/*
-.watermark {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.3);
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 16px;
+.list-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 16px;
 }
-*/
+
+.watermark-note {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 8px;
+    text-align: center;
+    font-style: italic; 
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between; 
+    margin-top: 10px;
+}
