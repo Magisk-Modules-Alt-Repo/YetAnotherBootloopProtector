@@ -65,6 +65,89 @@ let isEnvironmentSupported = false;
                 }
             );
         }
+async function openAllowedModulesDialog() {
+    await exec('mkdir -p /data/adb/YABP && [ ! -f /data/adb/YABP/allowed-modules.txt ] && touch /data/adb/YABP/allowed-modules.txt');
+    const { stdout: modules } = await exec('ls /data/adb/modules 2>/dev/null || echo ""');
+    const { stdout: allowed } = await exec('cat /data/adb/YABP/allowed-modules.txt || echo ""');
+    const allowedModules = allowed.split("\n");
+
+    let html = "";
+    modules.split("\n").forEach(module => {
+        if (!module.trim()) return;
+        const checked = allowedModules.includes(module) ? "checked" : "";
+        html += `<label><input type="checkbox" value="${module}" ${checked}> ${module}</label><br>`;
+    });
+
+    document.getElementById("allowedModulesList").innerHTML = html;
+    document.getElementById("allowedModulesDialog").style.display = "flex";
+}
+async function openAllowedScriptsDialog() {
+    const scriptDirs = [
+        "/data/adb/service.d",
+        "/data/adb/post-fs-data.d",
+        "/data/adb/post-mount.d",
+        "/data/adb/boot-completed.d"
+    ];
+    await exec('mkdir -p /data/adb/YABP && [ ! -f /data/adb/YABP/allowed-scripts.txt ] && touch /data/adb/YABP/allowed-scripts.txt');
+
+    const { stdout: allowed } = await exec('cat /data/adb/YABP/allowed-scripts.txt || echo ""');
+    const allowedScripts = allowed.split("\n");
+
+    let html = "";
+    for (const dir of scriptDirs) {
+        const { stdout: scripts } = await exec(`[ -d "${dir}" ] && ls -A "${dir}" 2>/dev/null || echo ""`);
+        if (!scripts.trim()) continue;
+
+        html += `<h3>${dir.replace("/data/adb/", "").toUpperCase()}</h3>`;
+        scripts.split("\n").forEach(script => {
+            if (!script.trim() || script === ".status.sh") return;
+            const checked = allowedScripts.includes(script) ? "checked" : "";
+            html += `<label><input type="checkbox" value="${script}" ${checked}> ${script}</label><br>`;
+        });
+    }
+
+    document.getElementById("allowedScriptsList").innerHTML = html;
+    document.getElementById("allowedScriptsDialog").style.display = "flex";
+}
+
+async function saveAllowedScripts() {
+    const { stdout: existingContent } = await exec('cat /data/adb/YABP/allowed-scripts.txt 2>/dev/null || echo ""');
+    const commentLines = existingContent
+        .split("\n")
+        .filter(line => line.trim().startsWith('#'));
+    const selectedScripts = Array.from(document.querySelectorAll("#allowedScriptsList input:checked"))
+        .map(input => input.value);
+    const finalContent = [...commentLines, ...selectedScripts].join("\n");
+
+    await exec('mkdir -p /data/adb/YABP && touch /data/adb/YABP/allowed-scripts.txt');
+    await exec(`echo "${finalContent}" > /data/adb/YABP/allowed-scripts.txt`);
+    document.getElementById("allowedScriptsDialog").style.display = "none";
+}
+
+
+async function saveAllowedModules() {
+    const { stdout: existingContent } = await exec('cat /data/adb/YABP/allowed-modules.txt 2>/dev/null || echo ""');
+    const commentLines = existingContent
+        .split("\n")
+        .filter(line => line.trim().startsWith('#'));
+    const selectedModules = Array.from(document.querySelectorAll("#allowedModulesList input:checked"))
+        .map(input => input.value);
+    const finalContent = [...commentLines, ...selectedModules].join("\n");
+    
+    await exec('mkdir -p /data/adb/YABP && touch /data/adb/YABP/allowed-modules.txt');
+    await exec(`echo "${finalContent}" > /data/adb/YABP/allowed-modules.txt`);
+    document.getElementById("allowedModulesDialog").style.display = "none";
+}
+
+
+
+function closeAllowedModulesDialog() {
+    document.getElementById("allowedModulesDialog").style.display = "none";
+}
+
+function closeAllowedScriptsDialog() {
+    document.getElementById("allowedScriptsDialog").style.display = "none";
+}
         async function disableAllModules() {
             showConfirmDialog(
                 "Disable All Modules",
@@ -155,43 +238,52 @@ async function enableAllModules() {
     );
 }
         async function initializeEnvironment() {
-            try {
-                if (typeof ksu === 'undefined' && typeof mmrl === 'undefined' && typeof $YetAnotherBootloopProtector === 'undefined') {
-                    isEnvironmentSupported = false;
-                    alert("Unsupported environment");
-                    return;
-                }
-                if (typeof ksu === 'undefined' || !ksu.exec) {
-                    isEnvironmentSupported = false;
-
-                    if (typeof mmrl !== 'undefined' && typeof $YetAnotherBootloopProtector !== 'undefined') {
-                        const ksuDialog = document.getElementById('ksuDialog');
-                        ksuDialog.style.display = 'flex';
-                        const requestKsuApiButton = document.getElementById('requestKsuApiButton');
-                        requestKsuApiButton.addEventListener('click', async () => {
-                            try {
-                                await $YetAnotherBootloopProtector.requestAdvancedKernelSUAPI();
-                                alert("KernelSU API access requested. Please grant access.");
-                                ksuDialog.style.display = 'none';
-                                initializeEnvironment();
-                            } catch (error) {
-                                console.log("Error requesting KernelSU API:", error);
-                                alert("Failed to request KernelSU API access.");
-                            }
-                        });
-                    }
-                    return;
-                }
-                const { errno } = await exec('id');
-                isEnvironmentSupported = errno === 0;
-                if (isEnvironmentSupported) {
-                    updateStatus();
-                    setInterval(updateStatus, 5000);
-                }
-            } catch {
-                isEnvironmentSupported = false;
-            }
+    try {
+        if (typeof ksu === 'undefined' && typeof mmrl === 'undefined' && typeof $YetAnotherBootloopProtector === 'undefined') {
+            isEnvironmentSupported = false;
+            alert("Unsupported environment");
+            return;
         }
+
+        if (typeof ksu === 'undefined' || !ksu.exec) {
+            isEnvironmentSupported = false;
+
+            if (typeof mmrl !== 'undefined' && typeof $YetAnotherBootloopProtector !== 'undefined') {
+                const ksuDialog = document.getElementById('ksuDialog');
+                ksuDialog.style.display = 'flex';
+
+                const requestKsuApiButton = document.getElementById('requestKsuApiButton');
+                requestKsuApiButton.onclick = async () => {
+                    try {
+                        await $YetAnotherBootloopProtector.requestAdvancedKernelSUAPI();
+                        alert("KernelSU API access granted!");
+                        ksuDialog.style.display = 'none';
+                        document.body.style.display = "block"; 
+                        
+                        setTimeout(() => {
+                            initializeEnvironment();
+                        }, 1000);
+                    } catch (error) {
+                        console.error("Error requesting KernelSU API:", error);
+                        alert("Failed to request KernelSU API access.");
+                    }
+                };
+            }
+            return;
+        }
+
+        const { errno } = await exec('id');
+        isEnvironmentSupported = errno === 0;
+
+        if (isEnvironmentSupported) {
+            updateStatus();
+            setInterval(updateStatus, 5000);
+        }
+    } catch (error) {
+        console.error("Error initializing environment:", error);
+        isEnvironmentSupported = false;
+    }
+}
         async function updateStatus() {
             if (!isEnvironmentSupported) return;
             try {
