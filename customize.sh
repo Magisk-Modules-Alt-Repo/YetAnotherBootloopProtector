@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ui_print "╔════════════════════════════════════════╗"
-ui_print "║        Yet Another Bootloop Protector  ║"
+ui_print "║        Yet Another Bootloop Protector      ║"
 ui_print "╚════════════════════════════════════════╝"
 ui_print ""
 ui_print "  🔧 Choose SystemUI Monitor Mode"
@@ -9,18 +9,25 @@ ui_print "-----------------------------------------"
 ui_print "  🔼 Press VOLUME UP   => ENABLE"
 ui_print "  🔽 Press VOLUME DOWN => DISABLE"
 ui_print "-----------------------------------------"
-ui_print "  Waiting for your choice..."
+ui_print "  Waiting for your choice (10s timeout)..."
 ui_print ""
+
+
+#ref "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/issues/2#issue-3012688788"
+
+timeout=10 #change value to change timeout 
 while true; do
-	event=$(getevent -qlc 1 2>/dev/null)
-	if echo "$event" | grep -q "KEY_VOLUMEUP"; then
-		ui_print "✅ SystemUI Monitor enabled."
-		if [ -f /data/adb/systemui.monitor.disable ]; then
-			rm -f /data/adb/systemui.monitor.disable
-		fi
+	event=$(timeout ${timeout} getevent -qlc 1 2>/dev/null)
+	if [ $? -eq 124 ]; then
+		ui_print "- No key pressed. Defaulting to DISABLED."
+		touch /data/adb/systemui.monitor.disable
 		break
 	fi
-	if echo "$event" | grep -q "KEY_VOLUMEDOWN"; then
+	if echo "$event" | grep -q "KEY_VOLUMEUP"; then
+		ui_print "✅ SystemUI Monitor enabled."
+		rm -f /data/adb/systemui.monitor.disable 2>/dev/null
+		break
+	elif echo "$event" | grep -q "KEY_VOLUMEDOWN"; then
 		ui_print "❌ SystemUI Monitor disabled."
 		touch /data/adb/systemui.monitor.disable
 		break
