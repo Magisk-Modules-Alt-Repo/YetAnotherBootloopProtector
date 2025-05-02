@@ -15,10 +15,11 @@ ui_print ""
 
 #ref "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/issues/2#issue-3012688788"
 
-
 while true; do
 	event=$(timeout ${timeout} getevent -qlc 1 2>/dev/null)
-	if [ $? -eq 124 ]; then
+	exitcode=$?
+	if [ "$exitcode" -eq 124 ] || [ "$exitcode" -eq 143 ]; then
+       # Magisk BusyBox `timeout` returned 143 (SIGTERM), Android toybox ( /system/bin/timeout ) returned 124.
 		ui_print "- No key pressed. Defaulting to DISABLED."
 		touch /data/adb/systemui.monitor.disable
 		break
@@ -33,6 +34,9 @@ while true; do
 		break
 	fi
 done
+
+
+
 ui_print ""
 mkdir -p "/data/adb/service.d"
 mv "$MODPATH/.status.sh" "/data/adb/service.d"
