@@ -27,6 +27,11 @@ jobs:
           echo "version=${MAJOR}.${CODE} (${CODE}-${SHORT}-release)"  >> $GITHUB_OUTPUT
           echo "tag=v${MAJOR}.${CODE}-${SHORT}"                       >> $GITHUB_OUTPUT
 
+      - name: Update module.prop
+        run: |
+          sed -i "s/^version=.*/version=${{ steps.ver.outputs.version }}/" module.prop
+          sed -i "s/^versionCode=.*/versionCode=${{ steps.ver.outputs.code }}/" module.prop
+
       - name: Generate sha256 files
         run: |
           find . \
@@ -37,11 +42,6 @@ jobs:
             -type f | while read -r f; do
               sha256sum "$f" | awk '{print $1}' > "${f}.sha256"
             done
-
-      - name: Update module.prop
-        run: |
-          sed -i "s/^version=.*/version=${{ steps.ver.outputs.version }}/" module.prop
-          sed -i "s/^versionCode=.*/versionCode=${{ steps.ver.outputs.code }}/" module.prop
 
       - name: Build zip
         id: zip
