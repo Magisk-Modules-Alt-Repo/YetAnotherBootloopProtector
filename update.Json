@@ -1,1 +1,6 @@
-
+{
+  "versionCode": 138,
+  "version": "8.138 (138-6537c16-release)",
+  "zipUrl": "https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases/download/v8.138-6537c16/YetAnotherBootloopProtector-138-v8.138-6537c16.zip",
+  "changelog": "https://raw.githubusercontent.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/main/changelog.md"
+}
