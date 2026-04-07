@@ -62,23 +62,37 @@
                 </div>
             </div>
 
+            <!-- Footer: icons left, version + source right -->
             <div class="footer">
-                <a href="#" onclick="openLink('https://github.com/rhythmcache')">GitHub</a>
-                <a href="#" onclick="openLink('https://rhythmcache.t.me')">Telegram</a>
-                <span class="watermark">WebUI by rhythmcache</span>
+                <div class="footer-icons">
+                    <div class="footer-icon" onclick="openLink('https://github.com/rhythmcache')" title="GitHub">
+                        <img src="github.png" alt="GitHub" onerror="this.outerHTML=githubFallbackSVG()">
+                    </div>
+                    <div class="footer-icon" onclick="openLink('https://dusk133.t.me')" title="Telegram">
+                        <img src="telegram.png" alt="Telegram" onerror="this.outerHTML=telegramFallbackSVG()">
+                    </div>
+                </div>
+                <div class="footer-right">
+                    <span class="watermark">WebUI by rhythmcache</span>
+                    <span class="footer-source-link" onclick="openLink('https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector')">Source code</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Dialogs (Moved to End of Body) -->
+    <!-- Log Dialog -->
     <div id="logDialog" class="dialog">
         <div class="dialog-content">
             <h2>Log Content</h2>
             <div id="logContent"></div>
-            <button class="btn btn-primary" onclick="closeLogDialog()">Close</button>
+            <div class="btn-group">
+                <button class="btn btn-danger" onclick="clearLogsFromDialog()">Clear</button>
+                <button class="btn btn-primary" onclick="closeLogDialog()">Close</button>
+            </div>
         </div>
     </div>
 
+    <!-- Confirm Dialog -->
     <div id="confirmDialog" class="confirm-dialog">
         <div class="dialog-content">
             <h2 id="confirmTitle">Confirm Action</h2>
@@ -90,6 +104,7 @@
         </div>
     </div>
 
+    <!-- Allowed Modules Dialog -->
     <div id="allowedModulesDialog" class="dialog">
         <div class="dialog-content">
             <h2>Select Allowed Modules</h2>
@@ -101,6 +116,7 @@
         </div>
     </div>
 
+    <!-- Allowed Scripts Dialog -->
     <div id="allowedScriptsDialog" class="dialog">
         <div class="dialog-content">
             <h2>Select Allowed Scripts</h2>
@@ -112,6 +128,7 @@
         </div>
     </div>
 
+    <!-- KSU API Dialog -->
     <div id="ksuDialog" class="dialog">
         <div class="dialog-content">
             <h2>MMRL Detected</h2>
@@ -122,6 +139,19 @@
         </div>
     </div>
 
+    <script>
+        // Inline SVG fallbacks if img files are missing
+        function githubFallbackSVG() {
+            return `<svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+            </svg>`;
+        }
+        function telegramFallbackSVG() {
+            return `<svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 14.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/>
+            </svg>`;
+        }
+    </script>
     <script src="index.js"></script>
 </body>
 </html>
