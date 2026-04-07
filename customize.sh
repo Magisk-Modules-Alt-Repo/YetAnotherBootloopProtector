@@ -32,7 +32,9 @@ while true; do
 done
 
 ui_print ""
-source "$MODPATH/verify.sh"
+sh "$MODPATH/verify.sh"
+[ $? -eq 0 ] || abort "! Aborting: file integrity check failed."
+ui_print "- All files verified."
 ui_print ""
 
 mkdir -p "/data/adb/service.d"
