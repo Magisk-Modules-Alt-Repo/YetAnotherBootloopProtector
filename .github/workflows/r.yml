@@ -20,20 +20,15 @@ jobs:
         id: ver
         run: |
           SHORT=$(git rev-parse --short HEAD)
-          # versionCode = total number of commits
           CODE=$(git rev-list --count HEAD)
-          # bump minor version from current module.prop major
           MAJOR=$(grep '^version=' module.prop | sed 's/version=\([0-9]*\).*/\1/')
-          VERSION="${MAJOR}.$(( CODE )) (${CODE}-${SHORT}-release)"
-          TAG="v${MAJOR}.${CODE}-${SHORT}"
-          echo "short=$SHORT"       >> $GITHUB_OUTPUT
-          echo "code=$CODE"         >> $GITHUB_OUTPUT
-          echo "version=$VERSION"   >> $GITHUB_OUTPUT
-          echo "tag=$TAG"           >> $GITHUB_OUTPUT
+          echo "short=$SHORT"                                          >> $GITHUB_OUTPUT
+          echo "code=$CODE"                                            >> $GITHUB_OUTPUT
+          echo "version=${MAJOR}.${CODE} (${CODE}-${SHORT}-release)"  >> $GITHUB_OUTPUT
+          echo "tag=v${MAJOR}.${CODE}-${SHORT}"                       >> $GITHUB_OUTPUT
 
       - name: Generate sha256 files
         run: |
-          # Find all files except .sha256, .git, and update.Json (which changes post-build)
           find . \
             -not -path './.git/*' \
             -not -path './.github/*' \
@@ -41,7 +36,7 @@ jobs:
             -not -name 'update.Json' \
             -type f | while read -r f; do
               sha256sum "$f" | awk '{print $1}' > "${f}.sha256"
-          done
+            done
 
       - name: Update module.prop
         run: |
@@ -52,10 +47,10 @@ jobs:
         id: zip
         run: |
           ZIPNAME="YetAnotherBootloopProtector-${{ steps.ver.outputs.code }}-${{ steps.ver.outputs.tag }}.zip"
-          # Exclude .git, update.Json (updated separately after release), and README
           zip -r "$ZIPNAME" . \
             -x '.git/*' \
-            -x '.github/*' -x '.github/**/*' \
+            -x '.github/*' \
+            -x '.github/**/*' \
             -x 'update.Json' \
             -x 'README.md' \
             -x '*.zip'
@@ -72,24 +67,18 @@ jobs:
 
       - name: Update update.Json
         run: |
-          cat > update.Json <<EOF
-          {
-              "versionCode": ${{ steps.ver.outputs.code }},
-              "version": "${{ steps.ver.outputs.version }}",
-              "zipUrl": "${{ fromJson(steps.release.outputs.assets)[0].browser_download_url }}",
-              "changelog": "https://raw.githubusercontent.com/${{ github.repository }}/main/changelog.md"
-          }
-          EOF
+          jq -n \
+            --argjson code ${{ steps.ver.outputs.code }} \
+            --arg version "${{ steps.ver.outputs.version }}" \
+            --arg zipUrl "${{ fromJson(steps.release.outputs.assets)[0].browser_download_url }}" \
+            --arg changelog "https://raw.githubusercontent.com/${{ github.repository }}/main/changelog.md" \
+            '{versionCode: $code, version: $version, zipUrl: $zipUrl, changelog: $changelog}' \
+            > update.Json
 
-      - name: Commit and push updated files
+      - name: Commit and push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Stage everything: sha256 files, module.prop, update.Json
           git add module.prop update.Json
-          git add $(git ls-files --others --exclude-standard | grep '\.sha256
-          git commit -m "chore: release ${{ steps.ver.outputs.tag }} [skip ci]"
-          git push
- | grep -v '^\.github/')
           git commit -m "chore: release ${{ steps.ver.outputs.tag }} [skip ci]"
           git push
