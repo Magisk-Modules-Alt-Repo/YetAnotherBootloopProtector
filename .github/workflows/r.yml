@@ -20,7 +20,9 @@ jobs:
         id: ver
         run: |
           SHORT=$(git rev-parse --short HEAD)
+          # versionCode = total number of commits
           CODE=$(git rev-list --count HEAD)
+          # bump minor version from current module.prop major
           MAJOR=$(grep '^version=' module.prop | sed 's/version=\([0-9]*\).*/\1/')
           VERSION="${MAJOR}.$(( CODE )) (${CODE}-${SHORT}-release)"
           TAG="v${MAJOR}.${CODE}-${SHORT}"
@@ -31,8 +33,10 @@ jobs:
 
       - name: Generate sha256 files
         run: |
+          # Find all files except .sha256, .git, and update.Json (which changes post-build)
           find . \
             -not -path './.git/*' \
+            -not -path './.github/*' \
             -not -name '*.sha256' \
             -not -name 'update.Json' \
             -type f | while read -r f; do
@@ -48,6 +52,7 @@ jobs:
         id: zip
         run: |
           ZIPNAME="YetAnotherBootloopProtector-${{ steps.ver.outputs.code }}-${{ steps.ver.outputs.tag }}.zip"
+          # Exclude .git, update.Json (updated separately after release), and README
           zip -r "$ZIPNAME" . \
             -x '.git/*' \
             -x '.github/*' -x '.github/**/*' \
@@ -80,6 +85,11 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add '*.sha256' '*/*.sha256' '*/*/*.sha256' '*/*/*/*.sha256' module.prop update.Json
+          # Stage everything: sha256 files, module.prop, update.Json
+          git add module.prop update.Json
+          git add $(git ls-files --others --exclude-standard | grep '\.sha256
+          git commit -m "chore: release ${{ steps.ver.outputs.tag }} [skip ci]"
+          git push
+ | grep -v '^\.github/')
           git commit -m "chore: release ${{ steps.ver.outputs.tag }} [skip ci]"
           git push
