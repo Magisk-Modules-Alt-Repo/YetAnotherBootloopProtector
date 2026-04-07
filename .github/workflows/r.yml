@@ -48,10 +48,9 @@ jobs:
         id: zip
         run: |
           ZIPNAME="YetAnotherBootloopProtector-${{ steps.ver.outputs.code }}-${{ steps.ver.outputs.tag }}.zip"
-          # Exclude .git, update.Json (updated separately after release), and README
           zip -r "$ZIPNAME" . \
             -x '.git/*' \
-            -x '.github/*' \
+            -x '.github/*' -x '.github/**/*' \
             -x 'update.Json' \
             -x 'README.md' \
             -x '*.zip'
