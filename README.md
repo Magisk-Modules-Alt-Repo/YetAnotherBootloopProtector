@@ -71,7 +71,7 @@ su -c rm -f /data/adb/systemui.monitor.disable
 
 
 
-[![Telegram](https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram)](https://rhythmcache.t.me)
+[![Telegram](https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram)](https://dusk133.t.me)
 
 
 [![Download](https://img.shields.io/github/downloads/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/total?label=Total%20Downloads&color=blue)](https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector/releases)
