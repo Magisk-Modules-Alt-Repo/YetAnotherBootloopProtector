@@ -1,0 +1,86 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute version info
+        id: ver
+        run: |
+          SHORT=$(git rev-parse --short HEAD)
+          CODE=$(git rev-list --count HEAD)
+          MAJOR=$(grep '^version=' module.prop | sed 's/version=\([0-9]*\).*/\1/')
+          VERSION="${MAJOR}.$(( CODE )) (${CODE}-${SHORT}-release)"
+          TAG="v${MAJOR}.${CODE}-${SHORT}"
+          echo "short=$SHORT"       >> $GITHUB_OUTPUT
+          echo "code=$CODE"         >> $GITHUB_OUTPUT
+          echo "version=$VERSION"   >> $GITHUB_OUTPUT
+          echo "tag=$TAG"           >> $GITHUB_OUTPUT
+
+      - name: Generate sha256 files
+        run: |
+          find . \
+            -not -path './.git/*' \
+            -not -name '*.sha256' \
+            -not -name 'update.Json' \
+            -type f | while read -r f; do
+              sha256sum "$f" | awk '{print $1}' > "${f}.sha256"
+          done
+
+      - name: Update module.prop
+        run: |
+          sed -i "s/^version=.*/version=${{ steps.ver.outputs.version }}/" module.prop
+          sed -i "s/^versionCode=.*/versionCode=${{ steps.ver.outputs.code }}/" module.prop
+
+      - name: Build zip
+        id: zip
+        run: |
+          ZIPNAME="YetAnotherBootloopProtector-${{ steps.ver.outputs.code }}-${{ steps.ver.outputs.tag }}.zip"
+          # Exclude .git, update.Json (updated separately after release), and README
+          zip -r "$ZIPNAME" . \
+            -x '.git/*' \
+            -x '.github/*' \
+            -x 'update.Json' \
+            -x 'README.md' \
+            -x '*.zip'
+          echo "zipname=$ZIPNAME" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub release
+        id: release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: ${{ steps.ver.outputs.version }}
+          body_path: changelog.md
+          files: ${{ steps.zip.outputs.zipname }}
+
+      - name: Update update.Json
+        run: |
+          cat > update.Json <<EOF
+          {
+              "versionCode": ${{ steps.ver.outputs.code }},
+              "version": "${{ steps.ver.outputs.version }}",
+              "zipUrl": "${{ fromJson(steps.release.outputs.assets)[0].browser_download_url }}",
+              "changelog": "https://raw.githubusercontent.com/${{ github.repository }}/main/changelog.md"
+          }
+          EOF
+
+      - name: Commit and push updated files
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add '*.sha256' '*/*.sha256' '*/*/*.sha256' '*/*/*/*.sha256' module.prop update.Json
+          git commit -m "chore: release ${{ steps.ver.outputs.tag }} [skip ci]"
+          git push
