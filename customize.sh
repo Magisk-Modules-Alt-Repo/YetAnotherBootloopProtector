@@ -32,7 +32,7 @@ while true; do
 done
 
 ui_print ""
-sh "$MODPATH/verify.sh"
+source "$MODPATH/verify.sh"
 [ $? -eq 0 ] || abort "! Aborting: file integrity check failed."
 ui_print "- All files verified."
 ui_print ""
