@@ -39,6 +39,8 @@ jobs:
             -not -path './.github/*' \
             -not -name '*.sha256' \
             -not -name 'update.Json' \
+            -not -name 'README.md' \
+            -not -name 'changelog.md' \
             -type f | while read -r f; do
               sha256sum "$f" | awk '{print $1}' > "${f}.sha256"
             done
@@ -53,6 +55,7 @@ jobs:
             -x '.github/**/*' \
             -x 'update.Json' \
             -x 'README.md' \
+            -x 'changelog.md' \
             -x '*.zip'
           echo "zipname=$ZIPNAME" >> $GITHUB_OUTPUT
 
