@@ -75,8 +75,8 @@ Hii! I'm [rhythmcache](https://github.com/rhythmcache), the developer of [YetAno
 
 If you like this project, consider supporting me by sponsoring the project or buying me a coffee. It really helps me continue working on it!
 
-☕ "Buy me a coffee" (https://www.buymeacoffee.com/triple_fault)
-💖 "Sponsor on GitHub" (https://github.com/sponsors/rhythmcache)
+☕ [Buy me a coffee](https://www.buymeacoffee.com/triple_fault)
+💖 [Sponsor on GitHub](https://github.com/sponsors/rhythmcache)
 
 
 
