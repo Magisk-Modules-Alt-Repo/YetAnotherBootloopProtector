@@ -71,7 +71,7 @@ su -c rm -f /data/adb/systemui.monitor.disable
 
 Support Me
 
-Hii! I'm "rhythmcache" (https://github.com/rhythmcache), the developer of [YetAnotherBootloopProtector](https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector).
+Hii! I'm [rhythmcache](https://github.com/rhythmcache), the developer of [YetAnotherBootloopProtector](https://github.com/Magisk-Modules-Alt-Repo/YetAnotherBootloopProtector).
 
 If you like this project, consider supporting me by sponsoring the project or buying me a coffee. It really helps me continue working on it!
 
